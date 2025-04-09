@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vienna Gambit Variations</title>
+</head>
+<body>
+  <h1>Vienna Gambit Variations</h1>
+  <form method="POST" action="/add">
+    <input type="text" name="title" placeholder="Title" required />
+    <input type="text" name="moves" placeholder="e4,e5,Nc3..." required />
+    <button type="submit">Add</button>
+  </form>
+  <ul>
+    <% variations.forEach(v => { %>
+      <li><a href="/variation/<%= v._id %>"><%= v.title %></a></li>
+    <% }) %>
+  </ul>
+</body>
+</html>

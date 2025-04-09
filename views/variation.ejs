@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title><%= variation.title %></title>
+  <link rel="stylesheet" href="/css/chessboard.css" />
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    #board {
+      width: 320px;
+    }
+    #moves {
+      max-width: 300px;
+      text-align: center;
+    }
+    .controls {
+      margin-top: 10px;
+    }
+    .controls button {
+      padding: 6px 12px;
+      margin: 0 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .home-button {
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+  </style>
+</head>
+<body>
+  <a class="home-button" href="/">⬅ Back to Home</a>
+  <h1><%= variation.title %></h1>
+  <div class="container">
+    <div id="board"></div>
+
+    <div class="controls">
+      <button id="prevBtn">◀ Previous</button>
+      <button id="nextBtn">Next ▶</button>
+    </div>
+
+    <div id="moves">
+      <h3>Moves</h3>
+      <ul id="moveList"></ul>
+    </div>
+  </div>
+
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/chess.js"></script>
+  <script src="/js/chessboard.js"></script>
+  <script>
+    const game = new Chess();
+    const board = Chessboard('board', {
+      draggable: true,
+      position: 'start',
+      pieceTheme: '/img/chesspieces/wikipedia/{piece}.png'
+    });
+
+    const variationMoves = JSON.parse('<%- JSON.stringify(variation.moves || []) %>');
+
+    let moveIndex = 0;
+
+    function renderBoard() {
+      game.reset();
+      for (let i = 0; i < moveIndex; i++) {
+        game.move(variationMoves[i]);
+      }
+      board.position(game.fen());
+      updateMoveList();
+    }
+
+    function updateMoveList() {
+      const history = game.history();
+      const moveList = document.getElementById('moveList');
+      moveList.innerHTML = '';
+      for (let i = 0; i < history.length; i += 2) {
+        const moveText = `${Math.floor(i / 2) + 1}. ${history[i]} ${history[i + 1] || ''}`;
+        const li = document.createElement('li');
+        li.textContent = moveText;
+        moveList.appendChild(li);
+      }
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (moveIndex < variationMoves.length) {
+        moveIndex++;
+        renderBoard();
+      }
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      if (moveIndex > 0) {
+        moveIndex--;
+        renderBoard();
+      }
+    });
+
+    renderBoard();
+  </script>
+</body>
+</html>
